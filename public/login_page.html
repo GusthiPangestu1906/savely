@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savely - Login ke Akun Anda</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Poppins', sans-serif; }
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 25%, #bae6fd 50%, #7dd3fc 75%, #38bdf8 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        .bg-pattern {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(14, 165, 233, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(2, 132, 199, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 60% 20%, rgba(56, 189, 248, 0.08) 0%, transparent 50%);
+            animation: patternFlow 25s ease-in-out infinite;
+        }
+        @keyframes patternFlow {
+            0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); }
+            33% { transform: translateX(-15px) translateY(-10px) rotate(1deg); }
+            66% { transform: translateX(10px) translateY(15px) rotate(-1deg); }
+        }
+        .main-container {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            animation: containerEntry 1.2s ease-out;
+            box-shadow: 
+                0 40px 80px -12px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(14, 165, 233, 0.1);
+        }
+        @keyframes containerEntry {
+            from {
+                opacity: 0;
+                transform: translateY(80px) scale(0.92);
+                filter: blur(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0px);
+            }
+        }
+        .logo-text {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 40%, #0369a1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: logoPresence 3s ease-in-out infinite alternate;
+        }
+        @keyframes logoPresence {
+            from { 
+                filter: drop-shadow(0 0 15px rgba(14, 165, 233, 0.4));
+                transform: scale(1);
+            }
+            to { 
+                filter: drop-shadow(0 0 25px rgba(14, 165, 233, 0.6));
+                transform: scale(1.03);
+            }
+        }
+        .input-field {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid #e2e8f0;
+            position: relative;
+            background: rgba(255, 255, 255, 0.85);
+        }
+        .input-field:focus {
+            border-color: #0ea5e9;
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 
+                0 0 0 4px rgba(14, 165, 233, 0.15),
+                0 10px 30px rgba(14, 165, 233, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+        .input-field:hover:not(:focus) {
+            border-color: #0284c7;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 5px 20px rgba(14, 165, 233, 0.12);
+            transform: translateY(-1px);
+        }
+        .password-field { position: relative; }
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #64748b;
+            transition: color 0.3s ease;
+        }
+        .password-toggle:hover { color: #0ea5e9; }
+        .btn-primary {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 50%, #0369a1 100%);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.7s;
+        }
+        .btn-primary:hover::before { left: 100%; }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 50%, #075985 100%);
+            transform: translateY(-4px);
+            box-shadow: 
+                0 30px 60px rgba(14, 165, 233, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.2);
+        }
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        .floating-shape {
+            position: absolute;
+            opacity: 0.08;
+            animation: floatDance 10s ease-in-out infinite;
+        }
+        .shape-1 { top: 10%; left: 8%; animation-delay: 0s; }
+        .shape-2 { top: 15%; right: 12%; animation-delay: 2.5s; }
+        .shape-3 { bottom: 25%; left: 15%; animation-delay: 5s; }
+        .shape-4 { bottom: 15%; right: 10%; animation-delay: 7.5s; }
+        .shape-5 { top: 50%; left: 5%; animation-delay: 1.5s; }
+        @keyframes floatDance {
+            0%, 100% { 
+                transform: translateY(0px) translateX(0px) rotate(0deg) scale(1); 
+            }
+            20% { 
+                transform: translateY(-40px) translateX(20px) rotate(72deg) scale(1.1); 
+            }
+            40% { 
+                transform: translateY(-25px) translateX(-15px) rotate(144deg) scale(0.9); 
+            }
+            60% { 
+                transform: translateY(-50px) translateX(25px) rotate(216deg) scale(1.2); 
+            }
+            80% { 
+                transform: translateY(-15px) translateX(-10px) rotate(288deg) scale(0.8); 
+            }
+        }
+        .form-field {
+            animation: fieldReveal 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        .form-field:nth-child(1) { animation-delay: 0.1s; }
+        .form-field:nth-child(2) { animation-delay: 0.2s; }
+        .form-field:nth-child(3) { animation-delay: 0.3s; }
+        .form-field:nth-child(4) { animation-delay: 0.4s; }
+        @keyframes fieldReveal {
+            from {
+                opacity: 0;
+                transform: translateY(40px) translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) translateX(0);
+            }
+        }
+        .header-subtitle {
+            background: linear-gradient(90deg, #64748b 0%, #475569 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .login-illustration {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .social-login-btn {
+            transition: all 0.3s ease;
+            border: 2px solid #e2e8f0;
+            background: rgba(255, 255, 255, 0.85);
+        }
+        .social-login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .google-btn:hover {
+            border-color: #DB4437;
+            background: rgba(219, 68, 55, 0.05);
+        }
+        .apple-btn:hover {
+            border-color: #000000;
+            background: rgba(0, 0, 0, 0.05);
+        }
+        .facebook-btn:hover {
+            border-color: #4267B2;
+            background: rgba(66, 103, 178, 0.05);
+        }
+        @media (max-width: 1024px) {
+            .login-illustration { display: none !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 md:p-6">
+    <div class="bg-pattern"></div>
+    <div class="floating-elements">
+        <div class="floating-shape shape-1 w-24 h-24 sm:w-28 sm:h-28 md:w-36 md:h-36 bg-gradient-to-br from-sky-300 to-blue-400 rounded-full"></div>
+        <div class="floating-shape shape-2 w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 bg-gradient-to-br from-blue-300 to-indigo-400 rounded-3xl"></div>
+        <div class="floating-shape shape-3 w-14 h-14 sm:w-16 sm:h-16 md:w-24 md:h-24 bg-gradient-to-br from-cyan-300 to-teal-400 rounded-full"></div>
+        <div class="floating-shape shape-4 w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 bg-gradient-to-br from-indigo-300 to-purple-400 rounded-2xl"></div>
+        <div class="floating-shape shape-5 w-10 h-10 sm:w-14 sm:h-14 md:w-20 md:h-20 bg-gradient-to-br from-emerald-300 to-cyan-400 rounded-full"></div>
+    </div>
+    <div class="main-container w-full max-w-6xl p-4 sm:p-8 md:p-12 lg:p-16 rounded-2xl md:rounded-3xl relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+            <div class="login-illustration hidden lg:block">
+                <div class="text-center">
+                    <img src="https://illustrations.popsy.co/amber/digital-nomad.svg" alt="Keamanan Finansial" class="w-full max-w-xs md:max-w-md mx-auto">
+                    <h3 class="text-xl md:text-2xl font-bold text-slate-800 mt-4 md:mt-6">Ketenangan Finansial Anda Dimulai Di Sini</h3>
+                    <p class="text-slate-600 mt-2 text-base md:text-lg">Akses tabungan dan investasi Anda dengan aman</p>
+                </div>
+            </div>
+            <div>
+                <div class="text-center mb-8 md:mb-12">
+                    <h1 class="logo-text text-4xl md:text-6xl font-bold mb-2 md:mb-4">SAVELY</h1>
+                    <p class="header-subtitle text-lg md:text-xl font-semibold">Selamat datang kembali di ketenangan finansial Anda</p>
+                </div>
+                <form class="space-y-6 md:space-y-8" id="loginForm">
+                    <div class="form-field">
+                        <label class="block text-slate-700 font-bold mb-2 md:mb-4 text-sm md:text-base uppercase tracking-wider">
+                            Email atau Nama Pengguna
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-4 md:left-6 top-1/2 transform -translate-y-1/2 text-slate-500">👤</span>
+                            <input 
+                                type="email" 
+                                class="input-field w-full pl-12 md:pl-16 pr-4 md:pr-6 py-3 md:py-5 rounded-xl md:rounded-2xl text-slate-700 font-semibold text-base md:text-lg"
+                                placeholder="Masukkan email atau nama pengguna Anda"
+                                required
+                            >
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label class="block text-slate-700 font-bold mb-2 md:mb-4 text-sm md:text-base uppercase tracking-wider">
+                            Kata Sandi
+                        </label>
+                        <div class="relative password-field">
+                            <span class="absolute left-4 md:left-6 top-1/2 transform -translate-y-1/2 text-slate-500">🔒</span>
+                            <input 
+                                type="password" 
+                                class="input-field w-full pl-12 md:pl-16 pr-12 md:pr-16 py-3 md:py-5 rounded-xl md:rounded-2xl text-slate-700 font-semibold text-base md:text-lg"
+                                placeholder="Masukkan kata sandi Anda"
+                                required
+                                id="password"
+                            >
+                            <span class="password-toggle" onclick="togglePassword('password')">👁️</span>
+                        </div>
+                    </div>
+                    <div class="form-field flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="remember" class="w-4 h-4 md:w-5 md:h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                            <label for="remember" class="ml-2 text-slate-700 font-medium text-sm md:text-base">Ingat saya</label>
+                        </div>
+                        </div>
+                    <div class="form-field pt-4 md:pt-6">
+                        <button 
+                            type="submit" 
+                            class="btn-primary w-full py-4 md:py-6 rounded-xl md:rounded-2xl font-bold text-lg md:text-xl text-white relative z-10"
+                        >
+                            LOGIN
+                        </button>
+                        <div id="loginMessage" class="text-center mt-4 text-sm font-semibold"></div>
+                    </div>
+                    <div class="form-field">
+                        <div class="relative flex items-center py-2 md:py-4">
+                            <div class="flex-grow border-t border-slate-300"></div>
+                            <span class="flex-shrink mx-2 md:mx-4 text-slate-500 font-medium text-xs md:text-base">ATAU LANJUTKAN DENGAN</span>
+                            <div class="flex-grow border-t border-slate-300"></div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 md:gap-4 mt-4 md:mt-6">
+                            <button type="button" class="social-login-btn google-btn py-3 md:py-4 rounded-lg md:rounded-xl flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6" viewBox="0 0 24 24" fill="#DB4437">
+                                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                                </svg>
+                            </button>
+                            <button type="button" class="social-login-btn apple-btn py-3 md:py-4 rounded-lg md:rounded-xl flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6" viewBox="0 0 24 24" fill="#000000">
+                                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                                </svg>
+                            </button>
+                            <button type="button" class="social-login-btn facebook-btn py-3 md:py-4 rounded-lg md:rounded-xl flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6" viewBox="0 0 24 24" fill="#4267B2">
+                                    <path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.22 5.96C15.31 5.96 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62 13.56 9.39 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96A10 10 0 0 0 22 12.06C22 6.53 17.5 2.04 12 2.04Z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-field text-center">
+                        <p class="text-slate-600 font-medium text-sm md:text-base">
+                            Belum punya akun? 
+                            <a href="/register_page.html" class="text-blue-600 font-bold hover:text-blue-700 transition-colors">Buat Akun</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+    // Fungsi untuk mengubah tipe input password (sembunyikan/tampilkan)
+    function togglePassword(fieldId) {
+        const field = document.getElementById(fieldId);
+        const toggle = field.nextElementSibling;
+        field.type = field.type === 'password' ? 'text' : 'password';
+        toggle.textContent = field.type === 'password' ? '👁️' : '🙈';
+    }
+
+    // Menangani pengiriman formulir login
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault(); // Mencegah pengiriman formulir default browser
+        
+        const email = document.querySelector('input[type="email"]').value; // Pastikan selector sesuai dengan tipe input email
+        const password = document.getElementById('password').value;
+        const messageEl = document.getElementById('loginMessage');
+        
+        // Bersihkan pesan sebelumnya
+        messageEl.textContent = '';
+        messageEl.className = `text-center mt-4 text-sm font-semibold`;
+
+        try {
+            // Mengirim data login ke API backend
+            const response = await fetch('/api/login', { // Menggunakan URL relatif
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                // Login berhasil
+                // Simpan token JWT di localStorage
+                localStorage.setItem('authToken', data.token);
+                showMessage('Login berhasil! Mengarahkan...', 'green');
+                console.log('Token JWT:', data.token); // Untuk debugging
+                // Arahkan pengguna ke halaman dashboard atau halaman yang dilindungi
+                setTimeout(() => window.location.href = 'dashboard.html', 1000); // Ganti 'dashboard.html' dengan halaman tujuan Anda
+            } else {
+                // Login gagal, tampilkan pesan error dari server
+                showMessage(data.error || 'Login gagal', 'red');
+            }
+        } catch (error) {
+            // Tangani error jaringan atau error lain
+            showMessage('Kesalahan jaringan. Silakan coba lagi.', 'red');
+            console.error('Error saat login:', error);
+        }
+    });
+    
+    // Fungsi untuk menampilkan pesan status (sukses/error)
+    function showMessage(text, color) {
+        const messageEl = document.getElementById('loginMessage');
+        messageEl.textContent = text;
+        messageEl.className = `text-center mt-4 text-sm font-semibold text-${color}-600`;
+    }
+</script>
+</body>
+</html>
