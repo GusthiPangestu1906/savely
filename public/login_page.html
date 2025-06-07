@@ -357,7 +357,7 @@
                 showMessage('Login berhasil! Mengarahkan...', 'green');
                 console.log('Token JWT:', data.token); // Untuk debugging
                 // Arahkan pengguna ke halaman dashboard atau halaman yang dilindungi
-                setTimeout(() => window.location.href = 'dashboard.html', 1000); // Ganti 'dashboard.html' dengan halaman tujuan Anda
+                setTimeout(() => window.location.assign(window.location.origin + '/dashboard.html'), 1000); 
             } else {
                 // Login gagal, tampilkan pesan error dari server
                 showMessage(data.error || 'Login gagal', 'red');

@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savely - My Transactions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Poppins dari Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Mengatur font Poppins sebagai font default untuk semua elemen */
+        * { 
+            font-family: 'Poppins', sans-serif; 
+            box-sizing: border-box; /* Memastikan padding dan border disertakan dalam lebar/tinggi elemen */
+        }
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 25%, #bae6fd 50%, #7dd3fc 75%, #38bdf8 100%);
+            position: relative;
+            overflow: hidden;
+            padding: 1rem;
+        }
+        .bg-pattern {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(14, 165, 233, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(2, 132, 199, 0.1) 0%, transparent 50%);
+            background-size: 800px 800px;
+            background-repeat: no-repeat;
+            pointer-events: none;
+        }
+        .main-container {
+            background-color: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.15), 0 5px 10px -5px rgba(0, 0, 0, 0.08); 
+            width: 100%;
+            max-width: 96rem; /* Lebar maksimum untuk desktop */
+            padding: 2rem;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        @media (min-width: 768px) {
+            body {
+                padding: 2rem;
+            }
+            .main-container {
+                padding: 2.5rem;
+            }
+        }
+
+        /* Styling for dashboard header */
+        .dashboard-header {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        @media (min-width: 768px) {
+            .dashboard-header {
+                flex-direction: row;
+                align-items: center;
+            }
+        }
+
+        .dashboard-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Styling for Transactions Section */
+        .transactions-section-header {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+        .transactions-section-subtitle {
+            font-size: 1rem;
+            color: #64748b;
+        }
+
+        /* Styling for each transaction card */
+        .transaction-card {
+            background-color: #f8fafc; /* slate-50 */
+            border-radius: 1rem; /* rounded-xl */
+            padding: 1rem 1.5rem; /* py-4 px-6 */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* shadow-sm */
+            display: flex;
+            flex-direction: column; /* Default: column */
+            align-items: flex-start; /* Align left */
+            gap: 0.5rem; /* Space between elements in card */
+            transition: all 0.2s ease-in-out;
+            border: 1px solid #e2e8f0; /* slate-200 */
+        }
+        .transaction-card:hover {
+            background-color: #eff6ff; /* blue-50 */
+            transform: translateY(-2px); /* Slight lift effect */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Stronger shadow */
+        }
+        /* Style for income card (green) */
+        .transaction-card.income {
+            border-left: 8px solid #22c55e; /* green-500 */
+        }
+        /* Style for expense card (red) */
+        .transaction-card.expense {
+            border-left: 8px solid #ef4444; /* red-500 */
+        }
+
+        @media (min-width: 768px) { /* md breakpoint */
+            .transaction-card {
+                flex-direction: row; /* Desktop: row */
+                align-items: center; /* Vertically center */
+                justify-content: space-between; /* Space between elements */
+                padding: 1.25rem 2rem; /* py-5 px-8 */
+            }
+        }
+
+        .transaction-icon-wrapper {
+            background-color: #dbeafe; /* blue-100 */
+            border-radius: 0.5rem; /* rounded-lg */
+            padding: 0.75rem; /* p-3 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.25rem; /* text-xl */
+            color: #3b82f6; /* blue-500 */
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+        .transaction-details {
+            flex-grow: 1; /* Fill available space */
+            text-align: left; /* Ensure text is left-aligned here */
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+            .transaction-details {
+                margin-left: 1rem; /* Add some space between icon and details on desktop */
+            }
+        }
+        .transaction-title {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600; /* font-semibold */
+            color: #1e293b; /* slate-900 */
+        }
+        .transaction-date-description {
+            font-size: 0.875rem; /* text-sm */
+            color: #64748b; /* slate-500 */
+            margin-top: 0.25rem;
+        }
+        .transaction-amount {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 700; /* font-bold */
+            color: #1e293b; /* slate-900 */
+            white-space: nowrap; /* Prevent line breaks for numbers */
+            margin-top: 0.5rem; /* Space on mobile */
+        }
+        /* Amount color based on type */
+        .transaction-amount.income-amount {
+            color: #16a34a; /* green-600 */
+        }
+        .transaction-amount.expense-amount {
+            color: #dc2626; /* red-600 */
+        }
+
+        @media (min-width: 768px) { /* md breakpoint */
+            .transaction-amount {
+                margin-top: 0; /* Remove space on desktop */
+                margin-left: 1.5rem; /* Add some space between details and amount on desktop */
+            }
+        }
+        .transaction-action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem; /* Space on mobile */
+            width: 100%; /* Full width on mobile */
+            justify-content: flex-end; /* Align right on mobile */
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+            .transaction-action-buttons {
+                margin-top: 0;
+                width: auto;
+            }
+        }
+       .budget-change-btn {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+            padding: 0.6rem 1.25rem; /* py-2.5 px-5 */
+            border-radius: 0.625rem; /* rounded-xl */
+            font-weight: 600; /* font-semibold */
+            transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+            cursor: pointer;
+            flex-shrink: 0; /* Jangan menyusut */
+            margin-top: 1rem; /* Spasi di mobile */
+            width: 100%; /* Full width di mobile */
+        }
+        .budget-change-btn:hover {
+            background-color: #2563eb; /* blue-600 */
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.2); /* Shadow lebih kuat */
+        }
+        .budget-change-btn:active {
+            transform: translateY(0);
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+            .budget-change-btn {
+                margin-top: 0; /* Hapus spasi di desktop */
+                margin-left: 1.5rem; /* Memberi sedikit spasi di desktop */
+                width: auto; /* Kembali ke auto width di desktop */
+            }
+        }
+        
+        /* Styles for the Modal Form (similar to budgetary_targeting.html) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25);
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            position: relative;
+        }
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .modal-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b;
+            transition: color 0.2s ease;
+        }
+        .modal-close-btn:hover {
+            color: #1e293b;
+        }
+        .form-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.5rem;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            background-color: #f8fafc;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease-in-out;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3), inset 0 1px 2px rgba(0, 0, 0, 0.05);
+            background-color: white;
+        }
+        .form-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        @media (min-width: 640px) {
+            .form-buttons {
+                flex-direction: row-reverse;
+                justify-content: flex-start;
+            }
+        }
+        .btn-submit {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-submit:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4);
+        }
+        .btn-submit:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(59, 130, 246, 0.2);
+        }
+        .btn-cancel {
+            background-color: #e2e8f0;
+            color: #334155;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-cancel:hover {
+            background-color: #cbd5e1;
+        }
+        /* Style for delete button in modal */
+        .btn-modal-delete {
+            background-color: #ef4444; /* red-500 */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+            transition: all 0.2s ease-in-out;
+            display: none; /* Hidden by default, shown when editing */
+        }
+        .btn-modal-delete:hover {
+            background-color: #dc2626; /* red-600 */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4);
+        }
+        .btn-modal-delete:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(239, 68, 68, 0.2);
+        }
+
+        /* Floating Add Button */
+        .add-floating-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 9999px;
+            padding: 1rem 1.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            z-index: 40;
+            transition: all 0.3s ease-in-out;
+        }
+        .add-floating-btn:hover {
+            background-color: #2563eb;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(59, 130, 246, 0.5);
+        }
+
+        /* Filter buttons styling */
+        .filter-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+        }
+        .filter-btn {
+            background-color: #e0f2fe; /* blue-100 */
+            color: #2563eb; /* blue-700 */
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            flex-grow: 1; /* Allow buttons to grow to fill space */
+            text-align: center;
+            max-width: 150px; /* Max width for filter buttons */
+        }
+        .filter-btn:hover {
+            background-color: #bfdbfe; /* blue-200 */
+        }
+        .filter-btn.active {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    <div class="main-container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="flex items-center gap-2">
+                <a href="/login_page.html" class="text-gray-500 hover:text-gray-700 transition-colors">
+                    <i class="fas fa-arrow-left text-2xl"></i> <!-- Icon for back button -->
+                </a>
+                <h1 class="dashboard-title">TRANSAKSI</h1>
+            </div>
+        </div>
+
+        <!-- Transactions Section -->
+        <div>
+            <h2 class="transactions-section-header">RIWAYAT TRANSAKSI</h2>
+            <p class="transactions-section-subtitle">Catat dan kelola semua pendapatan dan pengeluaran Anda di sini.</p>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all" id="filter-all">Semua</button>
+            <button class="filter-btn" data-filter="income" id="filter-income">Pendapatan</button>
+            <button class="filter-btn" data-filter="expense" id="filter-expense">Pengeluaran</button>
+        </div>
+
+        <!-- List of Transactions -->
+        <div class="flex flex-col gap-4" id="transactions-list">
+            <p class="text-gray-500 text-center py-8" id="loading-message">Memuat transaksi...</p>
+        </div>
+    </div>
+
+    <!-- Floating Add Button -->
+    <button id="add-transaction-floating-btn" class="add-floating-btn">
+        <i class="fas fa-plus"></i>
+        <span>Tambah Transaksi</span>
+    </button>
+
+    <!-- Modal Form for Add/Edit Transaction -->
+    <div id="transaction-modal-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn" id="modal-close-btn"><i class="fas fa-times"></i></button>
+            <h2 id="modal-title" class="form-title">Tambah Transaksi Baru</h2>
+            
+            <form id="transaction-form">
+                <input type="hidden" id="transaction-id" value=""> <!-- Hidden field for transaction ID when editing -->
+
+                <!-- Transaction Type (Income/Expense) -->
+                <div class="form-group">
+                    <label for="transaction-type" class="form-label">Jenis Transaksi</label>
+                    <select id="transaction-type" class="form-input form-select" required>
+                        <option value="">Pilih Jenis</option>
+                        <option value="income">Pendapatan</option>
+                        <option value="expense">Pengeluaran</option>
+                    </select>
+                </div>
+
+                <!-- Category Name (Dropdown) -->
+                <div class="form-group">
+                    <label for="transaction-category" class="form-label">Nama Kategori</label>
+                    <select id="transaction-category" class="form-input form-select" required>
+                        <option value="">Pilih Kategori</option>
+                        <!-- Options will be dynamically populated by JS based on type -->
+                    </select>
+                </div>
+
+                <!-- Amount -->
+                <div class="form-group">
+                    <label for="transaction-amount" class="form-label">Jumlah (IDR)</label>
+                    <input type="number" id="transaction-amount" class="form-input" placeholder="contoh: 500000" min="0" required>
+                </div>
+
+                <!-- Date -->
+                <div class="form-group">
+                    <label for="transaction-date" class="form-label">Tanggal</label>
+                    <input type="date" id="transaction-date" class="form-input" required>
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label for="transaction-description" class="form-label">Deskripsi (Opsional)</label>
+                    <textarea id="transaction-description" class="form-input form-textarea resize-none" rows="3" placeholder="contoh: Pembelian kebutuhan bulanan"></textarea>
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="submit" class="btn-submit" id="save-transaction-btn">Simpan Transaksi</button>
+                    <button type="button" class="btn-modal-delete" id="delete-transaction-btn">Hapus Transaksi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Store all fetched transactions globally
+        let allTransactions = [];
+        let currentFilter = 'all'; // Default filter
+
+        // Helper function to get JWT token from localStorage
+        function getAuthToken() {
+            return localStorage.getItem('authToken');
+        }
+
+        // Function to show messages (e.g., success, error)
+        function showMessage(text, color) {
+            const messageArea = document.createElement('div');
+            messageArea.textContent = text;
+            messageArea.className = `fixed top-4 left-1/2 -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg text-white text-center z-50 
+                                     ${color === 'green' ? 'bg-green-500' : 'bg-red-500'}`;
+            document.body.appendChild(messageArea);
+            setTimeout(() => {
+                messageArea.remove();
+            }, 3000); // Message disappears after 3 seconds
+        }
+
+        // Kategori untuk Pendapatan dan Pengeluaran
+        const incomeCategories = [
+            { value: 'Salary', text: 'Gaji' },
+            { value: 'Freelance', text: 'Freelance' },
+            { value: 'Investment', text: 'Investasi' },
+            { value: 'Gift', text: 'Hadiah' },
+            { value: 'OthersIncome', text: 'Lain-lain (Pendapatan)' }
+        ];
+
+        const expenseCategories = [
+            { value: 'Food & Beverages', text: 'Makanan & Minuman' },
+            { value: 'Transportation', text: 'Transportasi' },
+            { value: 'Shopping', text: 'Belanja' },
+            { value: 'Bills', text: 'Tagihan' },
+            { value: 'Entertainment', text: 'Hiburan' },
+            { value: 'Health', text: 'Kesehatan' },
+            { value: 'Education', text: 'Edukasi' },
+            { value: 'OthersExpense', text: 'Lain-lain (Pengeluaran)' }
+        ];
+
+        // Function to populate category dropdown based on transaction type
+        function populateCategories(type, selectedCategory = '') {
+            const categorySelect = document.getElementById('transaction-category');
+            if (!categorySelect) return; // Defensive check
+
+            categorySelect.innerHTML = '<option value="">Pilih Kategori</option>'; // Reset options
+
+            let categoriesToUse = [];
+            if (type === 'income') {
+                categoriesToUse = incomeCategories;
+            } else if (type === 'expense') {
+                categoriesToUse = expenseCategories;
+            }
+
+            categoriesToUse.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.value;
+                option.textContent = category.text;
+                if (category.value === selectedCategory) {
+                    option.selected = true;
+                }
+                categorySelect.appendChild(option);
+            });
+        }
+
+        // Function to create and return a transaction card HTML element
+        function createTransactionCard(transaction) {
+            const transactionCard = document.createElement('div');
+            // Add class 'income' or 'expense' based on transaction type
+            transactionCard.className = `transaction-card ${transaction.type}`; 
+            
+            let iconClass = 'fas fa-money-bill-transfer'; // Default icon
+            let amountClass = '';
+
+            if (transaction.type === 'income') {
+                iconClass = 'fas fa-arrow-up'; // Income icon
+                amountClass = 'income-amount';
+            } else if (transaction.type === 'expense') {
+                iconClass = 'fas fa-arrow-down'; // Expense icon
+                amountClass = 'expense-amount';
+            }
+
+            // More specific icons based on category (can be expanded)
+            if (transaction.category.toLowerCase().includes('food') || transaction.category.toLowerCase().includes('makan')) iconClass = 'fas fa-utensils';
+            else if (transaction.category.toLowerCase().includes('transportation') || transaction.category.toLowerCase().includes('bensin')) iconClass = 'fas fa-bus';
+            else if (transaction.category.toLowerCase().includes('shopping') || transaction.category.toLowerCase().includes('belanja')) iconClass = 'fas fa-shopping-bag';
+            else if (transaction.category.toLowerCase().includes('bills') || transaction.category.toLowerCase().includes('tagihan')) iconClass = 'fas fa-receipt';
+            else if (transaction.category.toLowerCase().includes('entertainment') || transaction.category.toLowerCase().includes('hiburan')) iconClass = 'fas fa-gamepad';
+            else if (transaction.category.toLowerCase().includes('health') || transaction.category.toLowerCase().includes('kesehatan')) iconClass = 'fas fa-heartbeat';
+            else if (transaction.category.toLowerCase().includes('education') || transaction.category.toLowerCase().includes('edukasi')) iconClass = 'fas fa-graduation-cap';
+            else if (transaction.category.toLowerCase().includes('salary') || transaction.category.toLowerCase().includes('gaji')) iconClass = 'fas fa-wallet';
+            else if (transaction.category.toLowerCase().includes('investment') || transaction.category.toLowerCase().includes('investasi')) iconClass = 'fas fa-chart-line';
+            else if (transaction.category.toLowerCase().includes('freelance')) iconClass = 'fas fa-laptop-code';
+
+            // Format amount to IDR currency
+            const formattedAmount = parseFloat(transaction.amount).toLocaleString('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            });
+
+            // Format date to 'DD MMMM YYYY'
+            const transactionDate = new Date(transaction.date);
+            const formattedDate = transactionDate.toLocaleDateString('id-ID', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            transactionCard.innerHTML = `
+                <div class="transaction-icon-wrapper">
+                    <i class="${iconClass}"></i>
+                </div>
+                <div class="transaction-details">
+                    <div class="transaction-title">${transaction.category}</div>
+                    <div class="transaction-date-description">${formattedDate} - ${transaction.description || 'Tidak ada deskripsi'}</div>
+                </div>
+                <div class="transaction-amount ${amountClass}">${formattedAmount}</div>
+                <div class="transaction-action-buttons">
+                    <button class="budget-change-btn" data-id="${transaction.id}">CHANGE</button>
+                </div>
+            `;
+            return transactionCard;
+        }
+
+        // Function to filter and render transactions based on type
+        function filterAndRenderTransactions(filterType) {
+            const transactionsList = document.getElementById('transactions-list');
+            if (!transactionsList) return; // Defensive check
+            transactionsList.innerHTML = ''; // Clear current list
+
+            let filteredTransactions = [];
+            if (filterType === 'all') {
+                filteredTransactions = allTransactions;
+            } else {
+                filteredTransactions = allTransactions.filter(t => t.type === filterType);
+            }
+
+            if (filteredTransactions.length > 0) {
+                filteredTransactions.forEach(transaction => {
+                    transactionsList.appendChild(createTransactionCard(transaction));
+                });
+            } else {
+                transactionsList.innerHTML = `<p class="text-gray-500 text-center py-8">Tidak ada transaksi ${filterType === 'income' ? 'pendapatan' : (filterType === 'expense' ? 'pengeluaran' : '')} ditemukan.</p>`;
+            }
+
+            // Update active state of filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.filter === filterType) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            currentFilter = filterType; // Update current filter state
+        }
+
+
+        // Function to fetch all transactions from the backend
+        async function fetchAllTransactions() {
+            const loadingMessage = document.getElementById('loading-message');
+            if (loadingMessage) loadingMessage.style.display = 'block';
+
+            const token = getAuthToken();
+            if (!token) {
+                showMessage('Autentikasi diperlukan. Mengarahkan ke halaman login.', 'red');
+                setTimeout(() => window.location.href = `${window.location.origin}/login_page.html`, 1500); 
+                if (loadingMessage) loadingMessage.style.display = 'none';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${window.location.origin}/api/transactions`, { 
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+
+                if (loadingMessage) loadingMessage.style.display = 'none';
+
+                if (result.success) {
+                    allTransactions = result.data || []; // Store all transactions
+                    filterAndRenderTransactions(currentFilter); // Render based on current filter
+                } else {
+                    showMessage(result.message || 'Gagal memuat transaksi.', 'red');
+                    console.error('API Error:', result.errors);
+                    if (response.status === 401 || response.status === 403) {
+                        setTimeout(() => window.location.href = `${window.location.origin}/login_page.html`, 1500); 
+                    }
+                }
+            } catch (error) {
+                console.error('Kesalahan jaringan saat memuat transaksi:', error);
+                if (loadingMessage) loadingMessage.style.display = 'none';
+                showMessage('Kesalahan jaringan. Gagal memuat transaksi.', 'red');
+            }
+        }
+
+        // Function to show the modal (for add or edit)
+        function showTransactionModal(isEditMode = false, transactionData = {}) {
+            const transactionModalOverlay = document.getElementById('transaction-modal-overlay');
+            const modalTitle = document.getElementById('modal-title');
+            const saveTransactionBtn = document.getElementById('save-transaction-btn');
+            const deleteTransactionBtn = document.getElementById('delete-transaction-btn');
+            const transactionForm = document.getElementById('transaction-form');
+            const transactionIdInput = document.getElementById('transaction-id');
+            const transactionTypeInput = document.getElementById('transaction-type');
+            const transactionCategoryInput = document.getElementById('transaction-category');
+            const transactionAmountInput = document.getElementById('transaction-amount');
+            const transactionDateInput = document.getElementById('transaction-date');
+            const transactionDescriptionInput = document.getElementById('transaction-description');
+
+            if (!transactionModalOverlay) {
+                console.error("Error: Element with ID 'transaction-modal-overlay' not found. Cannot show modal.");
+                return;
+            }
+            transactionModalOverlay.classList.add('active');
+
+            if (isEditMode && transactionData) {
+                modalTitle.textContent = 'Edit Transaksi';
+                saveTransactionBtn.textContent = 'Perbarui Transaksi';
+                if (deleteTransactionBtn) deleteTransactionBtn.style.display = 'block';
+
+                transactionIdInput.value = transactionData.id || '';
+                transactionTypeInput.value = transactionData.type || '';
+                // Populate categories after setting type, then set category value
+                populateCategories(transactionData.type, transactionData.category);
+                transactionAmountInput.value = transactionData.amount || '';
+                transactionDateInput.value = transactionData.date ? new Date(transactionData.date).toISOString().split('T')[0] : '';
+                transactionDescriptionInput.value = transactionData.description || '';
+            } else {
+                modalTitle.textContent = 'Tambah Transaksi Baru';
+                saveTransactionBtn.textContent = 'Simpan Transaksi';
+                if (deleteTransactionBtn) deleteTransactionBtn.style.display = 'none';
+                if (transactionForm) transactionForm.reset();
+                transactionIdInput.value = '';
+                // Reset type and clear categories
+                if (transactionTypeInput) transactionTypeInput.value = '';
+                populateCategories(''); 
+            }
+        }
+
+        // Function to hide the modal
+        function hideTransactionModal() {
+            const transactionModalOverlay = document.getElementById('transaction-modal-overlay');
+            if (transactionModalOverlay) {
+                transactionModalOverlay.classList.remove('active');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const transactionsList = document.getElementById('transactions-list');
+            const addTransactionFloatingBtn = document.getElementById('add-transaction-floating-btn');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+            const cancelFormBtn = document.getElementById('cancel-form-btn');
+            const transactionForm = document.getElementById('transaction-form');
+            const transactionTypeInput = document.getElementById('transaction-type');
+            const deleteTransactionBtn = document.getElementById('delete-transaction-btn');
+
+            const filterAllBtn = document.getElementById('filter-all');
+            const filterIncomeBtn = document.getElementById('filter-income');
+            const filterExpenseBtn = document.getElementById('filter-expense');
+
+            // Event listeners for filter buttons
+            if (filterAllBtn) filterAllBtn.addEventListener('click', () => filterAndRenderTransactions('all'));
+            if (filterIncomeBtn) filterIncomeBtn.addEventListener('click', () => filterAndRenderTransactions('income'));
+            if (filterExpenseBtn) filterExpenseBtn.addEventListener('click', () => filterAndRenderTransactions('expense'));
+
+
+            // Event listener for the floating "Add Transaction" button
+            if (addTransactionFloatingBtn) {
+                addTransactionFloatingBtn.addEventListener('click', () => showTransactionModal(false));
+            }
+
+            // Event listeners for closing the modal
+            if (modalCloseBtn) {
+                modalCloseBtn.addEventListener('click', hideTransactionModal);
+            }
+            if (cancelFormBtn) {
+                cancelFormBtn.addEventListener('click', hideTransactionModal);
+            }
+            const transactionModalOverlay = document.getElementById('transaction-modal-overlay'); 
+            if (transactionModalOverlay) {
+                transactionModalOverlay.addEventListener('click', (e) => {
+                    if (e.target === transactionModalOverlay) {
+                        hideTransactionModal();
+                    }
+                });
+            }
+
+            // Event listener for transaction type change to update categories
+            if (transactionTypeInput) {
+                transactionTypeInput.addEventListener('change', (e) => {
+                    populateCategories(e.target.value);
+                });
+            }
+
+            // Event listener for CHANGE button (delegated to the parent list)
+            if (transactionsList) {
+                transactionsList.addEventListener('click', async function(e) {
+                    const changeButton = e.target.closest('.budget-change-btn'); // Target the CHANGE button
+
+                    const transactionId = changeButton?.dataset.id;
+                    if (!transactionId) return;
+
+                    const token = getAuthToken();
+                    if (!token) {
+                        showMessage('Autentikasi diperlukan. Mengarahkan ke halaman login.', 'red');
+                        setTimeout(() => window.location.href = `${window.location.origin}/login_page.html`, 1500); 
+                        return;
+                    }
+
+                    if (changeButton) {
+                        try {
+                            const response = await fetch(`${window.location.origin}/api/transactions/${transactionId}`, {
+                                headers: { 'Authorization': `Bearer ${token}` }
+                            });
+                            const result = await response.json();
+
+                            if (result.success && result.data) {
+                                showTransactionModal(true, result.data);
+                            } else {
+                                showMessage(result.message || 'Gagal memuat transaksi untuk diedit.', 'red');
+                                console.error('API Error:', result.errors);
+                            }
+                        } catch (error) {
+                            console.error('Kesalahan jaringan saat memuat transaksi untuk diedit:', error);
+                            showMessage('Kesalahan jaringan. Gagal memuat transaksi untuk diedit.', 'red');
+                        }
+                    } 
+                    // The delete logic from here is removed as there's no separate delete button on the card
+                });
+            }
+
+            // Handle form submission (Add/Edit Transaction)
+            if (transactionForm) {
+                transactionForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+
+                    const id = document.getElementById('transaction-id').value;
+                    const type = document.getElementById('transaction-type').value;
+                    const category = document.getElementById('transaction-category').value;
+                    const amount = parseFloat(document.getElementById('transaction-amount').value);
+                    const date = document.getElementById('transaction-date').value;
+                    const description = document.getElementById('transaction-description').value;
+
+                    const transactionData = { type, category, amount, date, description };
+                    let url = `${window.location.origin}/api/transactions`; 
+                    let method = 'POST';
+
+                    if (id) { // If ID exists, it's an an update operation
+                        url = `${window.location.origin}/api/transactions/${id}`; 
+                        method = 'PUT';
+                    }
+
+                    const token = getAuthToken();
+                    if (!token) {
+                        showMessage('Autentikasi diperlukan. Mengarahkan ke halaman login.', 'red');
+                        setTimeout(() => window.location.href = `${window.location.origin}/login_page.html`, 1500); 
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(url, {
+                            method: method,
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify(transactionData)
+                        });
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            showMessage(result.message || 'Transaksi berhasil disimpan!', 'green');
+                            hideTransactionModal();
+                            fetchAllTransactions(); // Muat ulang semua dan saring kembali
+                        } else {
+                            showMessage(result.message || 'Gagal menyimpan transaksi.', 'red');
+                            console.error('API Error:', result.errors);
+                        }
+                    } catch (error) {
+                        console.error('Kesalahan jaringan saat menyimpan transaksi:', error);
+                        showMessage('Kesalahan jaringan. Silakan coba lagi.', 'red');
+                    }
+                });
+            }
+
+            // Event listener for the modal's delete button
+            if (deleteTransactionBtn) {
+                deleteTransactionBtn.addEventListener('click', async function() {
+                    const transactionId = document.getElementById('transaction-id').value;
+                    if (!transactionId) {
+                        showMessage('Tidak ada ID transaksi untuk dihapus.', 'red');
+                        return;
+                    }
+
+                    // PENTING: Ganti `confirm` ini dengan modal konfirmasi kustom untuk produksi
+                    if (!confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
+                        showMessage('Penghapusan dibatalkan.', 'red');
+                        return;
+                    }
+
+                    const token = getAuthToken();
+                    if (!token) {
+                        showMessage('Autentikasi diperlukan. Mengarahkan ke halaman login.', 'red');
+                        setTimeout(() => window.location.href = `${window.location.origin}/login_page.html`, 1500); 
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(`${window.location.origin}/api/transactions/${transactionId}`, {
+                            method: 'DELETE',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            showMessage(result.message || 'Transaksi berhasil dihapus!', 'green');
+                            hideTransactionModal();
+                            fetchAllTransactions(); // Muat ulang semua dan saring kembali
+                        } else {
+                            showMessage(result.message || 'Gagal menghapus transaksi.', 'red');
+                            console.error('API Error:', result.errors);
+                        }
+                    } catch (error) {
+                        console.error('Kesalahan jaringan saat menghapus transaksi:', error);
+                        showMessage('Kesalahan jaringan. Gagal menghapus transaksi.', 'red');
+                    }
+                });
+            }
+
+            // Initial fetch of transactions when the page loads
+            fetchAllTransactions();
+        });
+    </script>
+</body>
+</html>

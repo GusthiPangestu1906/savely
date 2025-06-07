@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savely - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="></link>
+    <style>
+        /* Mengatur font Inter sebagai font default untuk semua elemen */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 25%, #bae6fd 50%, #7dd3fc 75%, #38bdf8 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem; /* Padding responsif untuk mobile */
+            overflow-x: hidden; /* Mencegah scroll horizontal */
+        }
+        .main-container {
+            background-color: white;
+            border-radius: 1.5rem; /* Sudut membulat yang lebih besar */
+            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.15), 0 5px 10px -5px rgba(0, 0, 0, 0.08); /* Shadow yang lebih lembut dan elegan */
+            width: 100%;
+            max-width: 96rem; /* Lebar maksimum untuk desktop */
+            padding: 2.5rem; /* Padding yang lebih besar */
+            display: flex;
+            flex-direction: column;
+            gap: 2rem; /* Spasi antar bagian */
+        }
+
+        /* Responsive adjustments for larger screens */
+        @media (min-width: 768px) {
+            body {
+                padding: 2rem;
+            }
+            .main-container {
+                padding: 3rem;
+            }
+        }
+
+        /* Card styling */
+        .summary-card {
+            background-color: #f8fafc; /* slate-50 */
+            border-radius: 1rem; /* rounded-xl */
+            padding: 1.5rem; /* p-6 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* shadow-md */
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            border: 1px solid #e2e8f0; /* slate-200 */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .summary-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Card header (title and insert button) */
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-title {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600; /* font-semibold */
+            color: #1e293b; /* slate-900 */
+        }
+        .insert-button {
+            background-color: #38bdf8; /* sky-400 */
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.5rem; /* rounded-lg */
+            font-size: 0.75rem; /* text-xs */
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        .insert-button:hover {
+            background-color: #0ea5e9; /* sky-600 */
+            transform: translateY(-1px);
+        }
+
+        /* Card amount styling */
+        .card-amount {
+            font-size: 1.75rem; /* text-3xl */
+            font-weight: 800; /* font-extrabold */
+            color: #1e293b; /* slate-900 */
+        }
+        .card-percentage {
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 500; /* font-medium */
+            color: #475569; /* slate-600 */
+        }
+
+        /* Latest Transactions / Budget Overview shared card styling */
+        .section-card {
+            background-color: #f8fafc;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #cbd5e1; /* slate-300 */
+        }
+        .section-title {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 700; /* font-bold */
+            color: #1e293b;
+        }
+        .section-subtitle {
+            font-size: 0.875rem; /* text-sm */
+            color: #64748b; /* slate-500 */
+            margin-top: 0.25rem;
+        }
+        .details-button {
+            background-color: #e0f2fe; /* blue-100 */
+            color: #2563eb; /* blue-700 */
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.625rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        .details-button:hover {
+            background-color: #bfdbfe; /* blue-200 */
+            transform: translateY(-1px);
+        }
+
+        /* Individual transaction/budget item */
+        .item-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border: 1px solid #f1f5f9; /* slate-100 */
+            transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        .item-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .item-icon-wrapper {
+            background-color: #e0f2fe; /* blue-100 */
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.25rem;
+            color: #3b82f6; /* blue-500 */
+            flex-shrink: 0;
+        }
+        .item-details {
+            flex-grow: 1;
+        }
+        .item-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .item-subtitle {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+        .item-amount {
+            font-size: 1rem;
+            font-weight: 700;
+            white-space: nowrap; /* Mencegah pecah baris untuk angka */
+        }
+        .item-amount.income {
+            color: #16a34a; /* green-600 */
+        }
+        .item-amount.expense {
+            color: #dc2626; /* red-600 */
+        }
+        .item-amount.neutral {
+            color: #1e293b; /* slate-900 */
+        }
+
+        /* Custom icons (using Font Awesome) */
+        .fa-money-bill-transfer, .fa-burger, .fa-cart-shopping, 
+        .fa-car, .fa-receipt, .fa-gamepad {
+            /* Basic styling for all icons */
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header Section -->
+        <div class="welcome-section">
+            <h1 class="text-3xl font-extrabold text-slate-900 mb-2" id="welcome-message">WELCOME, GUSTHI</h1>
+            <p class="text-lg text-slate-600">Here is a breakdown of your income and expenses this month</p>
+        </div>
+
+        <!-- Summary Cards Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Income Card -->
+            <div class="summary-card">
+                <div class="card-header">
+                    <span class="card-title">Income</span>
+                    <button class="insert-button">Insert</button>
+                </div>
+                <div class="card-amount">RP 12,500,000</div>
+                <div class="card-percentage text-green-600">+12.5% from last month</div>
+            </div>
+
+            <!-- Expenses Card -->
+            <div class="summary-card">
+                <div class="card-header">
+                    <span class="card-title">Expenses</span>
+                    <button class="insert-button">Insert</button>
+                </div>
+                <div class="card-amount">RP 12,500,000</div>
+                <div class="card-percentage text-red-600">-12.5% from last month</div>
+            </div>
+
+            <!-- Savings Card -->
+            <div class="summary-card">
+                <div class="card-header">
+                    <span class="card-title">Savings</span>
+                    <button class="insert-button">Insert</button>
+                </div>
+                <div class="card-amount">RP 12,500,000</div>
+                <div class="card-percentage text-blue-600">+12.5% from last month</div>
+            </div>
+        </div>
+
+        <!-- Latest Transactions Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">LATEST TRANSACTIONS</h2>
+                    <p class="section-subtitle">Here are your most recent transactions</p>
+                </div>
+                <button class="details-button">DETAILS</button>
+            </div>
+            
+            <div class="flex flex-col gap-3">
+                <!-- Transaction Item 1 -->
+                <div class="item-card">
+                    <div class="item-icon-wrapper">
+                        <i class="fas fa-sack-dollar"></i> <!-- Icon for Monthly Salary -->
+                    </div>
+                    <div class="item-details">
+                        <div class="item-title">Monthly Salary</div>
+                        <div class="item-subtitle">Income</div>
+                    </div>
+                    <div class="item-amount income">+ Rp 8.500.000</div>
+                </div>
+
+                <!-- Transaction Item 2 -->
+                <div class="item-card">
+                    <div class="item-icon-wrapper">
+                        <i class="fas fa-burger"></i> <!-- Icon for Lunch -->
+                    </div>
+                    <div class="item-details">
+                        <div class="item-title">Lunch</div>
+                        <div class="item-subtitle">Expenses</div>
+                    </div>
+                    <div class="item-amount expense">- Rp 45.000</div>
+                </div>
+
+                <!-- Transaction Item 3 -->
+                <div class="item-card">
+                    <div class="item-icon-wrapper">
+                        <i class="fas fa-cart-shopping"></i> <!-- Icon for Monthly Shopping -->
+                    </div>
+                    <div class="item-details">
+                        <div class="item-title">Monthly Shopping</div>
+                        <div class="item-subtitle">Expenses</div>
+                    </div>
+                    <div class="item-amount expense">- Rp 150.000</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Budget Overview Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">BUDGET OVERVIEW</h2>
+                    <p class="section-subtitle">Track how your money was spent this month</p>
+                </div>
+                <button class="details-button">DETAILS</button>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <!-- Budget Item 1 -->
+                <div class="item-card">
+                    <div class="item-icon-wrapper">
+                        <i class="fas fa-burger"></i>
+                    </div>
+                    <div class="item-details">
+                        <div class="item-title">Food & Beverages</div>
+                        <div class="item-subtitle text-green-600">+12.5% from target</div>
+                    </div>
+                    <div class="item-amount neutral">Rp 45.000</div>
+                </div>
+
+                <!-- Budget Item 2 -->
+                <div class="item-card">
+                    <div class="item-icon-wrapper">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <div class="item-details">
+                        <div class="item-title">Transportation</div>
+                        <div class="item-subtitle text-red-600">-12.5% from target</div>
+                    </div>
+                    <div class="item-amount neutral">Rp 45.000</div>
+                </div>
+
+                <!-- Budget Item 3 -->
+                <div class="item-card">
+                    <div class="item-icon-wrapper">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div class="item-details">
+                        <div class="item-title">Shopping</div>
+                        <div class="item-subtitle text-green-600">+12.5% from target</div>
+                    </div>
+                    <div class="item-amount neutral">Rp 45.000</div>
+                </div>
+
+                <!-- Budget Item 4 -->
+                <div class="item-card">
+                    <div class="item-icon-wrapper">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <div class="item-details">
+                        <div class="item-title">Bills</div>
+                        <div class="item-subtitle text-red-600">-12.5% from target</div>
+                    </div>
+                    <div class="item-amount neutral">Rp 45.000</div>
+                </div>
+
+                <!-- Budget Item 5 -->
+                <div class="item-card">
+                    <div class="item-icon-wrapper">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <div class="item-details">
+                        <div class="item-title">Entertainment</div>
+                        <div class="item-subtitle text-green-600">+12.5% from target</div>
+                    </div>
+                    <div class="item-amount neutral">Rp 45.000</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const welcomeMessageElement = document.getElementById('welcome-message');
+            const authToken = localStorage.getItem('authToken'); // Ambil token dari localStorage
+
+            if (!authToken) {
+                // Jika tidak ada token, arahkan ke halaman login
+                console.log('Tidak ada token autentikasi ditemukan. Mengarahkan ke halaman login.');
+                // Menggunakan window.location.assign() dengan URL lengkap
+                window.location.assign(window.location.origin + '/login_page.html');
+                return;
+            }
+
+            try {
+                // Lakukan permintaan ke endpoint yang dilindungi untuk mendapatkan data pengguna
+                const response = await fetch('/api/protected', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}` // Sertakan token di header
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // Jika respons berhasil dan ada data pengguna, perbarui pesan selamat datang
+                    welcomeMessageElement.textContent = `WELCOME, ${data.user.name.toUpperCase()}`;
+                } else {
+                    // Jika ada masalah dengan token atau respons API
+                    console.error('Gagal mendapatkan data pengguna:', data.message || 'Respons tidak valid');
+                    // Hapus token yang mungkin tidak valid dan arahkan ke login
+                    localStorage.removeItem('authToken');
+                    // Menggunakan window.location.assign() dengan URL lengkap
+                    window.location.assign(window.location.origin + '/login_page.html');
+                }
+            } catch (error) {
+                console.error('Kesalahan jaringan saat memuat data pengguna:', error);
+                // Tangani kesalahan jaringan, mungkin arahkan ke halaman error atau login
+                localStorage.removeItem('authToken');
+                // Menggunakan window.location.assign() dengan URL lengkap
+                window.location.assign(window.location.origin + '/login_page.html');
+            }
+        });
+    </script>
+</body>
+</html>

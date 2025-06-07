@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savely - Budget Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Impor font Poppins dari Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        * { 
+            font-family: 'Poppins', sans-serif; 
+            box-sizing: border-box;
+        }
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 25%, #bae6fd 50%, #7dd3fc 75%, #38bdf8 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .bg-pattern {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(14, 165, 233, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(2, 132, 199, 0.1) 0%, transparent 50%);
+            background-size: 800px 800px;
+            background-repeat: no-repeat;
+            pointer-events: none;
+        }
+        .modal-container {
+            background-color: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25);
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px; /* Batasi lebar di layar besar */
+            position: relative;
+            z-index: 20; /* Pastikan di atas pattern */
+        }
+        .modal-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b; /* slate-500 */
+            transition: color 0.2s ease;
+        }
+        .modal-close-btn:hover {
+            color: #1e293b; /* slate-900 */
+        }
+        .form-title {
+            font-size: 1.75rem; /* text-3xl */
+            font-weight: 700; /* font-bold */
+            color: #3b82f6; /* blue-500 */
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 1.25rem; /* space-y-5 */
+        }
+        .form-label {
+            display: block;
+            font-size: 0.9rem; /* text-sm */
+            font-weight: 600;
+            color: #334155; /* slate-700 */
+            margin-bottom: 0.5rem;
+        }
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #cbd5e1; /* slate-300 */
+            border-radius: 0.75rem; /* rounded-xl */
+            font-size: 1rem;
+            background-color: #f8fafc; /* slate-50 */
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease-in-out;
+        }
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #38bdf8; /* sky-500 */
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3), inset 0 1px 2px rgba(0, 0, 0, 0.05);
+            background-color: white;
+        }
+        .btn-submit {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-submit:hover {
+            background-color: #2563eb; /* blue-600 */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4);
+        }
+        .btn-submit:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(59, 130, 246, 0.2);
+        }
+        .btn-cancel {
+            background-color: #e2e8f0; /* slate-200 */
+            color: #334155; /* slate-700 */
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-cancel:hover {
+            background-color: #cbd5e1; /* slate-300 */
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    <div class="modal-container">
+        <button class="modal-close-btn" onclick="alert('Close button clicked!')"><i class="fas fa-times"></i></button>
+        <h2 class="form-title">Set Budget Target</h2>
+        
+        <form>
+            <!-- Category Name -->
+            <div class="form-group">
+                <label for="budget-category" class="form-label">Category Name</label>
+                <input type="text" id="budget-category" class="form-input" placeholder="e.g., Food & Beverages" required>
+            </div>
+
+            <!-- Amount -->
+            <div class="form-group">
+                <label for="budget-amount" class="form-label">Target Amount (IDR)</label>
+                <input type="number" id="budget-amount" class="form-input" placeholder="e.g., 500000" min="0" required>
+            </div>
+
+            <!-- Start Date -->
+            <div class="form-group">
+                <label for="budget-start-date" class="form-label">Start Date</label>
+                <input type="date" id="budget-start-date" class="form-input" required>
+            </div>
+
+            <!-- End Date -->
+            <div class="form-group">
+                <label for="budget-end-date" class="form-label">End Date</label>
+                <input type="date" id="budget-end-date" class="form-input" required>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row-reverse gap-3 mt-6">
+                <button type="submit" class="btn-submit">Save Budget</button>
+                <button type="button" class="btn-cancel" onclick="alert('Cancel button clicked!')">Cancel</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
